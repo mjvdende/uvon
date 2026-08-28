@@ -104,7 +104,9 @@ export async function POST(request: Request) {
 
     // If event is paid, configure Mollie payment
     const mollieApiKey = process.env.MOLLIE_API_KEY;
-    const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXTAUTH_URL 
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") 
+      || "http://localhost:3000";
 
     if (mollieApiKey && mollieApiKey.startsWith("test_")) {
       try {
