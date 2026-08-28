@@ -1,8 +1,17 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import bcrypt from "bcrypt";
 
-// Direct client initialization for seeding script running in Node environment
-const prisma = new PrismaClient();
+const connectionString = process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error("No database connection string defined (POSTGRES_PRISMA_URL or DATABASE_URL).");
+}
+
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");
