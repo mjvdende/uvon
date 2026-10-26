@@ -1,35 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UVON Noord-Brabant Platform
 
-## Getting Started
+A modern full-stack web platform for **UVON (Unie van Vrouwelijke Ondernemers) Noord-Brabant**, built with Next.js 16 (App Router, Turbopack), React 19, Tailwind CSS v4, Prisma, PostgreSQL, and NextAuth.js.
 
-First, run the development server:
+---
 
+## 🚀 Quick Start (Local Development)
+
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v20+ or v22+)
+- [Docker Desktop](https://www.docker.com/) (for running local PostgreSQL container)
+
+### 2. Clone & Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone git@github.com:mjvdende/uvon.git
+cd uvon
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Start Local PostgreSQL Database
+The repository includes a ready-to-use `docker-compose.yml` for PostgreSQL:
+```bash
+docker compose up -d
+```
+*(Note: If you have an old `dev.db` file in the root directory, it was from a legacy SQLite prototype. The current application uses PostgreSQL via `@prisma/adapter-pg` matching the configuration in `.env`)*.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Push Database Schema & Seed Data
+Initialize the database tables and populate sample members, events, registrations, and documents:
+```bash
+# Push schema to local database
+npx prisma db push
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Populate with mock members, events, and documents
+npx tsx prisma/seed.ts
+```
 
-## Learn More
+### 5. Start Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧪 Testing Suite
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Unit & Integration Tests (Fast, ~1.3s)
+Tests authentication sentinels, password hashing, and API route validation without external browser overhead:
+```bash
+npm test
+```
 
-## Deployment & Hosting
+### End-to-End (E2E) Browser Tests (Playwright)
+Spins up headless Chromium to verify real browser rendering, member search filtering, event navigation, archive listing, and contact forms:
+```bash
+npm run test:e2e
+```
 
-For detailed instructions on how to host this application on **Vercel** ($0/month) and connect it with your domain and email at **mijn.host**, please refer to the [Deployment Guide](file:///c:/Users/maart/projecten/uvon/docs/deployment.md).
+---
 
+## 📂 Key Architecture & Documentation
+
+- **[FEATURES.md](FEATURES.md)**: The single source of truth for all domain models, business workflows, view matrices, and business rules (Specification-Driven Development).
+- **[AGENTS.md](AGENTS.md)**: Onboarding and technical guidelines for AI agents and human developers (Next.js 16 conventions, Prisma 7 Pg adapter rules, NextAuth credentials, etc.).
+- **[docs/deployment.md](docs/deployment.md)**: Production deployment instructions for hosting on **Vercel** ($0/month) paired with DNS & email at **mijn.host**.
+
+---
+
+## 🛠️ Common Commands
+
+| Command | Description |
+| :--- | :--- |
+| `npm run dev` | Starts local Next.js Turbopack dev server on `http://localhost:3000` |
+| `npm run build` | Compiles production build and validates TypeScript across all routes |
+| `npm run lint` | Runs ESLint 9 checks |
+| `npm test` | Runs unit & route validation tests (`tests/**/*.test.ts`) |
+| `npm run test:e2e` | Runs Playwright browser E2E tests (`e2e/**/*.spec.ts`) |
+| `npx prisma generate` | Regenerates Prisma Client adapter after schema updates |
+| `npx prisma db push` | Pushes schema directly to the database without manual migration files |
+| `npx tsx prisma/seed.ts` | Populates database with initial mock users, events, and documents |
